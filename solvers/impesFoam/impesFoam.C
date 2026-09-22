@@ -63,7 +63,17 @@ int main(int argc, char *argv[])
     #include "createTimeControls.H"
 
     Info<< "\nReading g" << endl;
-    const meshObjects::gravity& g = meshObjects::gravity::New(runTime);
+    uniformDimensionedVectorField g
+    (
+        IOobject
+        (
+            "g",
+            runTime.constant(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    );
 
     #include "createFields.H"
     #include "createSbFields.H"
@@ -99,9 +109,31 @@ int main(int argc, char *argv[])
         //- Solve saturation equation (explicit)
         #include "SEqn.H"
         #include "updateSbProperties.H"
+        #include "updateLiquidContent.H"
 
         //- Solve pressure equation (implicit)
         #include "pEqn.H"
+
+        //- Steady-state check: compare Sb between successive *write* times
+        //  (not successive, possibly tiny, timesteps) so the comparison
+        //  spans a physically meaningful time window (writeInterval).
+        if (convergence > 0 && runTime.writeTime())
+        {
+            scalarField SbField(Sb.internalField());
+            scalarField SbOldField(SbOld.internalField());
+            scalar maxSbChange = gMax(mag(SbField - SbOldField));
+            Info<< "Max Sb change since last write = " << maxSbChange << endl;
+
+            if (maxSbChange < convergence)
+            {
+                Info<< "Steady-state reached (max Sb change since last write = "
+                    << maxSbChange << " < convergence = " << convergence
+                    << "), stopping." << endl;
+                runTime.writeAndEnd();
+            }
+
+            SbOld = Sb;
+        }
 
         outputEvent->write();
 

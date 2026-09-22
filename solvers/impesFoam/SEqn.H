@@ -24,6 +24,15 @@
 
     SbEqn.solve();
 
+    if (fixedSbActive)
+    {
+        forAll(mesh.cellZones()[fixedSbZoneID], i)
+        {
+            Sb[mesh.cellZones()[fixedSbZoneID][i]] = fixedSbValue;
+        }
+        Sb.correctBoundaryConditions();
+    }
+
     Info << "Saturation b: " << " Min(Sb) = " << gMin(Sb) << " Max(Sb) = " << gMax(Sb) << endl;
 
 }
