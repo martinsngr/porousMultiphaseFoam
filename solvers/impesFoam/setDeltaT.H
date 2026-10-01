@@ -51,19 +51,29 @@ switch(static_cast<int>(CFLint))
         break;
 };
 
-scalar deltaTFact = min(min(maxDeltaTFact, 1.0 + 0.1*maxDeltaTFact), 1.2);
+//- Only adapt deltaT when explicitly requested (adjustTimeStep true in
+//  controlDict). Otherwise keep the deltaT set in controlDict/timeDict,
+//  the CFL/Coats numbers above are still computed and reported for
+//  monitoring purposes.
+if (adjustTimeStep)
+{
+    scalar deltaTFact = min(min(maxDeltaTFact, 1.0 + 0.1*maxDeltaTFact), 1.2);
 
-//- Computing timestep 
-runTime.setDeltaT
-(
-    min(
-        dtForS,
-        min(
-            deltaTFact*runTime.deltaTValue(),
-            maxDeltaT
+    //- Computing timestep, clamped to [minDeltaT, maxDeltaT]
+    runTime.setDeltaT
+    (
+        max(
+            minDeltaT,
+            min(
+                dtForS,
+                min(
+                    deltaTFact*runTime.deltaTValue(),
+                    maxDeltaT
+                )
+            )
         )
-    )
-);
+    );
+}
 
 Info<< "deltaT = " <<  runTime.deltaTValue() << endl;
 

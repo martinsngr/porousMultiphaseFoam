@@ -244,10 +244,13 @@ volScalarField mLiquid
 mLiquid.primitiveFieldRef() = rhob.value()*theta.primitiveField()*mesh.V();
 
 //- Running log of total liquid volume/mass in the whole domain, appended
-//  at each write time (units chosen for a lab-scale sample: mL and g).
+//  at each write time (units chosen for a lab-scale sample: mL and g), and
+//  of the volume-weighted mean saturation sum(Sb*V)/sum(V).
 autoPtr<OFstream> liquidBalanceFile;
 if (Pstream::master())
 {
     liquidBalanceFile.reset(new OFstream("liquidBalance.csv"));
-    liquidBalanceFile() << "time,totalLiquidVolume_mL,totalLiquidMass_g" << endl;
+    liquidBalanceFile()
+        << "time,totalLiquidVolume_mL,totalLiquidMass_g,meanSaturation"
+        << endl;
 }

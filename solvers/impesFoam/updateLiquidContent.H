@@ -3,12 +3,21 @@
 theta = eps*Sb;
 mLiquid.primitiveFieldRef() = rhob.value()*theta.primitiveField()*mesh.V();
 
-if (runTime.writeTime() && Pstream::master())
+if (runTime.writeTime())
 {
+    //- domainIntegrate is a global reduction: every rank must call it,
+    //  otherwise the master deadlocks waiting for the other processors.
     scalar totalLiquidVolume = fvc::domainIntegrate(theta).value(); // m3
     scalar totalLiquidMass = rhob.value()*totalLiquidVolume;        // kg
-    liquidBalanceFile()
-        << runTime.timeName() << ","
-        << totalLiquidVolume*1e6 << ","
-        << totalLiquidMass*1e3 << endl;
+    scalar meanSaturation =
+        fvc::domainIntegrate(Sb).value()/gSum(mesh.V());
+
+    if (Pstream::master())
+    {
+        liquidBalanceFile()
+            << runTime.timeName() << ","
+            << totalLiquidVolume*1e6 << ","
+            << totalLiquidMass*1e3 << ","
+            << meanSaturation << endl;
+    }
 }
