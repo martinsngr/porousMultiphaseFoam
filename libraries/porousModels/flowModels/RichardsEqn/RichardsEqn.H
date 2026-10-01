@@ -42,7 +42,7 @@ SourceFiles
 #include "fvMatrix.H"
 #include "twophasePorousMediumModel.H"
 #include "multiDtManager.H"
-#include "gravityMeshObject.H"
+#include "uniformDimensionedFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -97,7 +97,7 @@ class RichardsEqn
 
     //- Internal functions
     fvScalarMatrix buildEqn();
-    scalar initResidual(const fvScalarMatrix& hEqn);
+    scalar initResidual(fvScalarMatrix& hEqn);
 
 public:
     // Constructors

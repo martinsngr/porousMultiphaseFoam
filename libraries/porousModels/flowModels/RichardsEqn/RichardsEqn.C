@@ -43,7 +43,17 @@ Foam::flowModels::RichardsEqn::RichardsEqn
     bool steady
 )
     :
-    g_(meshObjects::gravity::New(mesh.time())),
+    g_
+    (
+        IOobject
+        (
+            "g",
+            mesh.time().constant(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    ),
     h_
     (
         IOobject
@@ -84,8 +94,8 @@ Foam::flowModels::RichardsEqn::RichardsEqn
     ),
     mesh_(mesh),
     pmModel_(pmModel),
-    krModel_(pmModel.krModel().ref()),
-    pcModel_(pmModel.pcModel().ref()),
+    krModel_(pmModel.krModel()()),
+    pcModel_(pmModel.pcModel()()),
     sourceTerm_(pmModel_.sourceTerm()),
     K_(pmModel_.K()),
     U_(fluidPhase.U()),
@@ -260,7 +270,7 @@ Foam::fvScalarMatrix Foam::flowModels::RichardsEqn::buildEqn()
 
 Foam::scalar Foam::flowModels::RichardsEqn::initResidual
 (
-    const fvScalarMatrix& hEqn
+    fvScalarMatrix& hEqn
 ) {
     scalarField Ax(mesh_.nCells());
     scalarField Axbar(mesh_.nCells());
@@ -326,11 +336,22 @@ const Foam::Tuple2<Foam::scalar, Foam::scalar> Foam::flowModels::RichardsEqn::so
     Tuple2<scalar, scalar> res(0, 0);
     fvScalarMatrix hEqnPicard = buildEqn();
     res.first() = initResidual(hEqnPicard);
-    tmp<DimensionedField<scalar, volMesh>> ResiduN = DimensionedField<scalar, volMesh>::New(
-        "ResiduN",
-        mesh_,
-        dimless/dimTime,
-        (hEqnPicard.residual()/mesh_.V())()
+    tmp<DimensionedField<scalar, volMesh>> ResiduN
+    (
+        new DimensionedField<scalar, volMesh>
+        (
+            IOobject
+            (
+                "ResiduN",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimless/dimTime,
+            (hEqnPicard.residual()/mesh_.V())()
+        )
     );
     Info << "Richards' equation initial residual = " << res.first() << endl;
 
@@ -378,7 +399,7 @@ const Foam::Tuple2<Foam::scalar, Foam::scalar> Foam::flowModels::RichardsEqn::so
         }
     }
     if (seepageIDList_.size() > 0) {
-        deltahEqn.setValues(seepageIDList_,0);
+        deltahEqn.setValues(seepageIDList_,scalarField(seepageIDList_.size(),0));
     }
 
     deltahEqn.solve();

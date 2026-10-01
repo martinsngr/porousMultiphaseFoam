@@ -51,7 +51,7 @@ Foam::multiscalarMixture::multiscalarMixture
     const word& porousRegion
 )
     :
-    basicMultiComponentMixture(dict, speciesNames, mesh, phaseName),
+    Y_(speciesNames.size()),
     R_(speciesNames.size()),
     lambdas_(speciesNames.size()),
     dispersionModels_(speciesNames.size()),
@@ -64,6 +64,22 @@ Foam::multiscalarMixture::multiscalarMixture
     Info<< nl << "******** Initializing mixture properties for region  " << porousRegion << " ********" << endl;
     forAll(speciesNames, speciesi)
     {
+        Y_.set
+        (
+            speciesi,
+            new volScalarField
+            (
+                IOobject
+                (
+                    speciesNames[speciesi],
+                    mesh.time().timeName(),
+                    mesh,
+                    IOobject::MUST_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh
+            )
+        );
 
         Info<< nl << "***** Specie " << speciesNames[speciesi] << porousRegion << " *****" << endl;
 
@@ -71,15 +87,15 @@ Foam::multiscalarMixture::multiscalarMixture
         specieDict = specieDict.optionalSubDict(porousRegion);
         dictionary porousTransport(specieDict.subDict("porousTransport"));
 
-        dimensionedScalar Kd(porousTransport.getOrDefault("Kd", dimensionedScalar(dimensionSet(-1,3,0,0,0), 0)));
+        dimensionedScalar Kd(porousTransport.lookupOrDefault("Kd", dimensionedScalar(dimensionSet(-1,3,0,0,0), 0)));
         Kd_[speciesi] = Kd.value();
-        dimensionedScalar rs(porousTransport.getOrDefault("rs", dimensionedScalar(dimensionSet(1,-3,0,0,0), 0)));
+        dimensionedScalar rs(porousTransport.lookupOrDefault("rs", dimensionedScalar(dimensionSet(1,-3,0,0,0), 0)));
         rs_[speciesi] = rs.value();
-        dimensionedScalar epsTotal(porousTransport.getOrDefault("epsTotal", dimensionedScalar(dimless, 1)));
+        dimensionedScalar epsTotal(porousTransport.lookupOrDefault("epsTotal", dimensionedScalar(dimless, 1)));
         epsTotal_[speciesi] = epsTotal.value();
 
         lambdas_[speciesi].dimensions().reset(dimensionSet(0,0,-1,0,0));
-        lambdas_[speciesi] = porousTransport.getOrDefault("lambda", dimensionedScalar(dimensionSet(0,0,-1,0,0), 0));
+        lambdas_[speciesi] = porousTransport.lookupOrDefault("lambda", dimensionedScalar(dimensionSet(0,0,-1,0,0), 0));
 
         if (porousRegion != "")
         {
@@ -124,7 +140,7 @@ Foam::multiscalarMixture::multiscalarMixture
         //- read source event if present
         if(specieDict.found("sourceEventFileTracer"))
         {
-            word sourceEventFileName = specieDict.getOrDefault<word>("sourceEventFileTracer","");
+            word sourceEventFileName = specieDict.lookupOrDefault<word>("sourceEventFileTracer","");
             sourceEvents_.set(speciesi, new sourceEventFile(sourceEventFileName, true));
 
             const word& dtFieldName =
@@ -182,9 +198,9 @@ void Foam::multiscalarMixture::correct
     {
         dispersionModels_[speciesi].correct(Y(speciesi), U, theta);
         R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / theta;
-        if(auto event = sourceEvents_.get(speciesi))
+        if(sourceEvents_.set(speciesi))
         {
-            sourceTerms_.set(speciesi, event->dtValuesAsField());
+            sourceTerms_.set(speciesi, sourceEvents_[speciesi].dtValuesAsField());
         }
     }
 }
@@ -201,9 +217,9 @@ void Foam::multiscalarMixture::correct
     {
         dispersionModels_[speciesi].correct(Y(speciesi), U, saturation, eps);
         R_[speciesi].primitiveFieldRef() = 1 + (1-epsTotal_[speciesi]) * rs_[speciesi] * Kd_[speciesi] / (eps*saturation);
-        if(auto event = sourceEvents_.get(speciesi))
+        if(sourceEvents_.set(speciesi))
         {
-            sourceTerms_.set(speciesi, event->dtValuesAsField());
+            sourceTerms_.set(speciesi, sourceEvents_[speciesi].dtValuesAsField());
         }
     }
 }
@@ -231,9 +247,9 @@ bool Foam::multiscalarMixture::initRetardCoef(const volScalarField& eps)
 
 void Foam::multiscalarMixture::updateNormalizedGradY() {
     //- create field if not present
-    if (!normalizedGradY_.good()) {
+    if (!normalizedGradY_.valid()) {
         const fvMesh& mesh = Y_[0].mesh();
-        normalizedGradY_ = autoPtr<volScalarField>::New(
+        normalizedGradY_ = autoPtr<volScalarField>(new volScalarField(
             IOobject
                 (
                     "normalizedGradC",
@@ -245,11 +261,11 @@ void Foam::multiscalarMixture::updateNormalizedGradY() {
             mesh,
             dimensionedScalar("zero", dimless, 0),
             "zeroGradient"
-        );
+        ));
     }
 
     //- Compute normalized gradient
-    volScalarField& gradY = normalizedGradY_.ref();
+    volScalarField& gradY = normalizedGradY_();
     gradY = 0.0;
     forAll(Y(), speciei) {
         tmp<volScalarField> tmagGradY = mag(fvc::grad(Y()[speciei]));

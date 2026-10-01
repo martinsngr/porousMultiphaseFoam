@@ -167,8 +167,8 @@ void Foam::outputEventFile::updateInterpolationFactor()
 void Foam::outputEventFile::checkControlDict() const
 {
     const dictionary& cDict = runTime_.controlDict();
-    scalar endTimeValue(cDict.get<scalar>("endTime"));
-    scalar writeIntervalValue(cDict.getOrDefault<scalar>("writeInterval",GREAT));
+    scalar endTimeValue(readScalar(cDict.lookup("endTime")));
+    scalar writeIntervalValue(cDict.lookupOrDefault<scalar>("writeInterval",GREAT));
     if (cDict.found("writeFrequency"))
     {
         FatalErrorIn("outputEventFile.C") << "Check controlDict: writeFrequency cannot be used when outputEventFile is specified"<< exit(FatalError);
@@ -254,7 +254,7 @@ void Foam::outputEventFile::write() {
     if (isPresent_) {
         if (currentEventEndTime() <= runTime_.timeOutputValue()) {
             //- Check that mesh did not change during this time step
-            if (dyMesh_) {
+            if (dyMesh_.valid()) {
                 if (dyMesh_->changing()) {
                     Info << "*** WARNING ***" << nl << "Skip time interpolation at t = " << currentEventEndTime()
                          << " because mesh has changed " << endl << endl;
@@ -271,7 +271,7 @@ void Foam::outputEventFile::write() {
             forAll(outputFields_, fieldi) {
                 outputFields_[fieldi].write(runTime_.timeName(), runTime_.value(), ifactor_);
             }
-            if (dyMesh_) {
+            if (dyMesh_.valid()) {
                 dyMesh_->write();
             }
             runTime_.setTime(timeBackup, runTime_.timeIndex());

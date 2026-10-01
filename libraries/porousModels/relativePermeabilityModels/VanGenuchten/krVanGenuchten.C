@@ -70,7 +70,7 @@ Foam::relativePermeabilityModels::krVanGenuchten::krVanGenuchten
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar(dimless, modelProperties_.getOrDefault<scalar>("m"+porousRegion,0))
+        dimensionedScalar(dimless, modelProperties_.lookupOrDefault<scalar>("m"+porousRegion,0))
     ),
     kramax_
     (
@@ -83,7 +83,7 @@ Foam::relativePermeabilityModels::krVanGenuchten::krVanGenuchten
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar(dimless, modelProperties_.getOrDefault<scalar>("kr"+Sname+"max"+porousRegion,1.0))
+        dimensionedScalar(dimless, modelProperties_.lookupOrDefault<scalar>("kr"+Sname+"max"+porousRegion,1.0))
     ),
     krbmax_
     (
@@ -96,7 +96,7 @@ Foam::relativePermeabilityModels::krVanGenuchten::krVanGenuchten
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar(dimless, modelProperties_.getOrDefault<scalar>("kr"+Sname+"max"+porousRegion,1.0))
+        dimensionedScalar(dimless, modelProperties_.lookupOrDefault<scalar>("kr"+Sname+"max"+porousRegion,1.0))
     )
 {
     if (gMin(m_) <= 0)

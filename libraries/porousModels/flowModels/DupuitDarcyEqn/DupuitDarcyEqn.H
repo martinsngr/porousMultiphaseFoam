@@ -43,7 +43,6 @@ SourceFiles
 #include "porousMediumModel.H"
 #include "incompressiblePhase.H"
 #include "multiDtManager.H"
-#include "gravityMeshObject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

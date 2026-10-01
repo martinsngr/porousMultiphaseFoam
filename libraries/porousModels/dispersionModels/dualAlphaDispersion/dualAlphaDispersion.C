@@ -69,7 +69,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("tau",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("tau",dimless,dualAlphaDispersionCoeffs_)
     ),
     alphaLsat_
     (
@@ -82,7 +82,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("alphaL_sat",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("alphaL_sat",dimensionSet(0,1,0,0,0,0,0),dualAlphaDispersionCoeffs_)
     ),
     alphaTsat_
     (
@@ -95,7 +95,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("alphaT_sat",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("alphaT_sat",dimensionSet(0,1,0,0,0,0,0),dualAlphaDispersionCoeffs_)
     ),
     alphaLunsat_
     (
@@ -108,7 +108,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("alphaL_unsat",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("alphaL_unsat",dimensionSet(0,1,0,0,0,0,0),dualAlphaDispersionCoeffs_)
     ),
     alphaTunsat_
     (
@@ -121,7 +121,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("alphaT_unsat",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("alphaT_unsat",dimensionSet(0,1,0,0,0,0,0),dualAlphaDispersionCoeffs_)
     ),
     coef_
     (
@@ -147,7 +147,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("thetaThreshold_sat",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("thetaThreshold_sat",dimless,dualAlphaDispersionCoeffs_)
     ),
     thetaThresholdUnsat_
     (
@@ -160,7 +160,7 @@ Foam::dispersionModels::dualAlphaDispersion::dualAlphaDispersion
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("thetaThreshold_unsat",dualAlphaDispersionCoeffs_)
+        dimensionedScalar("thetaThreshold_unsat",dimless,dualAlphaDispersionCoeffs_)
     )  
 {
     Info << "Parameters for dualAlpha dispersion model" << nl << "{" << endl;

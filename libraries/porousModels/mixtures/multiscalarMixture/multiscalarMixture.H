@@ -39,8 +39,6 @@ SourceFiles
 #ifndef multiscalarMixture_H
 #define multiscalarMixture_H
 
-#include "basicMultiComponentMixture.H"
-
 #include "volFields.H"
 #include "PtrList.H"
 #include "speciesTable.H"
@@ -59,8 +57,6 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 
 class multiscalarMixture
-:
-    public basicMultiComponentMixture
 {
 
 public:
@@ -129,7 +125,16 @@ public:
     //- Compute normalized maximal gradient
     void updateNormalizedGradY();
 
+    //- Return the mass/molar-fraction fields
+    inline PtrList<volScalarField>& Y() {return Y_;}
+    inline const PtrList<volScalarField>& Y() const {return Y_;}
+
+    //- Return the mass/molar-fraction field for a specie given by index
+    inline volScalarField& Y(const label i) {return Y_[i];}
+    inline const volScalarField& Y(const label i) const {return Y_[i];}
+
 private:
+    PtrList<volScalarField> Y_;
     PtrList<volScalarField> R_;
     List<dimensionedScalar> lambdas_;
     PtrList<dispersionModel> dispersionModels_;

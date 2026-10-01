@@ -30,7 +30,7 @@ License
 #include "eventInfiltration.H"
 #include "addToRunTimeSelectionTable.H"
 #include "surfaceFields.H"
-#include "gravityMeshObject.H"
+#include "uniformDimensionedFields.H"
 
 
 Foam::List<Foam::patchEventFile*>* Foam::eventInfiltration::eventFileRegistry_ = nullptr;
@@ -72,11 +72,11 @@ eventInfiltration
 )
     :
     fixedValueFvPatchVectorField(h, iF, dict, false),
-    fixedInfiltrationValue_(dict.getOrDefault<scalar>("constantValue",0.)),
+    fixedInfiltrationValue_(dict.lookupOrDefault<scalar>("constantValue",0.)),
     patchEventID_(-1),
     eventFile_()
 {
-    word eventFileName = dict.getOrDefault<word>("eventFile","");
+    word eventFileName = dict.lookupOrDefault<word>("eventFile","");
     Info << nl << "eventFileName " << eventFileName << endl;
 
     if (eventFileName != "")
@@ -102,7 +102,7 @@ eventInfiltration
         eventFile_.setTimeScheme(dtFieldName, iF.mesh());
 
         //- Reading patch event file and adding intermediate time step
-        scalar eventTimeStep = this->db().time().controlDict().getOrDefault<scalar>("eventTimeStep",0);
+        scalar eventTimeStep = this->db().time().controlDict().lookupOrDefault<scalar>("eventTimeStep",0);
         if (eventTimeStep > 0)
         {
             eventFile_.addIntermediateTimeSteps(eventTimeStep);
@@ -124,9 +124,9 @@ eventInfiltration
     }
 
     const uniformDimensionedVectorField& g =
-        meshObjects::gravity::New(db().time());
+        db().time().lookupObject<uniformDimensionedVectorField>("g");
     orientation_ = -g.value();
-    orientation_.normalise();
+    orientation_ /= mag(orientation_);
 
 }
 
@@ -141,19 +141,6 @@ eventInfiltration
 )
 :
     fixedValueFvPatchVectorField(ptf, h, iF, mapper),
-    fixedInfiltrationValue_(ptf.fixedInfiltrationValue_),
-    patchEventID_(-1),
-    eventFile_()
-{}
-
-
-Foam::eventInfiltration::
-eventInfiltration
-(
-    const eventInfiltration& ptf
-)
-:
-    fixedValueFvPatchVectorField(ptf),
     fixedInfiltrationValue_(ptf.fixedInfiltrationValue_),
     patchEventID_(-1),
     eventFile_()
@@ -198,7 +185,7 @@ void Foam::eventInfiltration::updateCoeffs()
 void Foam::eventInfiltration::write(Ostream& os) const
 {
     fvPatchVectorField::write(os);
-    this->writeEntry("value", os);
+    writeEntry(os, "value", *this);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

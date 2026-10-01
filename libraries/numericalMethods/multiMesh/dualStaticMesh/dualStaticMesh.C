@@ -123,11 +123,11 @@ void Foam::dualStaticMesh::initialRefinement()
     forAll(fSf.boundaryField(), patchi) {
         boundaryMapping_[patchi].resize(fSf.boundaryField()[patchi].size());
         forAll(fSf.boundaryField()[patchi], tgtFacei) {
-            label fCell = fineMesh.boundary().faceCells()[patchi][tgtFacei];
+            label fCell = fineMesh.boundary()[patchi].faceCells()[tgtFacei];
             label cCell = cellMapping_[fCell];
             forAll(coarseMesh_.cells()[cCell], facei) {
-                label b_face = coarseMesh_.cells()[cCell][facei] - bCoarseMesh.patchStarts()[patchi];
-                if (b_face > -1 && b_face < bCoarseMesh.patchSizes()[patchi]) {
+                label b_face = coarseMesh_.cells()[cCell][facei] - bCoarseMesh[patchi].start();
+                if (b_face > -1 && b_face < bCoarseMesh[patchi].size()) {
                     if ((fSf.boundaryField()[patchi][tgtFacei] & cSf.boundaryField()[patchi][b_face]) > 0 ) {
                         boundaryMapping_[patchi][tgtFacei] = b_face;
                     }
@@ -182,13 +182,12 @@ Foam::volScalarField& Foam::dualStaticMesh::addField
             (
                 coarseField.name()+"_dual",
                 coarseField.time().timeName(),
-                fineMeshPtr_,
+                fineMeshPtr_(),
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            fineMeshPtr_,
-            0,
-            coarseField.dimensions(),
+            fineMeshPtr_(),
+            dimensioned<scalar>("zero", coarseField.dimensions(), 0),
             coarseField.boundaryField().types()
         )
     );
@@ -220,13 +219,12 @@ Foam::volVectorField& Foam::dualStaticMesh::addField
             (
                 coarseField.name()+"_dual",
                 coarseField.time().timeName(),
-                fineMeshPtr_,
+                fineMeshPtr_(),
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            fineMeshPtr_,
-            Vector<scalar>(0,0,0),
-            coarseField.dimensions(),
+            fineMeshPtr_(),
+            dimensioned<vector>("zero", coarseField.dimensions(), Vector<scalar>(0,0,0)),
             coarseField.boundaryField().types()
         )
     );
@@ -250,13 +248,12 @@ Foam::surfaceScalarField& Foam::dualStaticMesh::addField
         (
             coarsePhi.name()+"_dual",
             coarsePhi.time().timeName(),
-            fineMeshPtr_,
+            fineMeshPtr_(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        fineMeshPtr_,
-        0,
-        coarsePhi.dimensions(),
+        fineMeshPtr_(),
+        dimensioned<scalar>("zero", coarsePhi.dimensions(), 0),
         coarsePhi.boundaryField().types()
     );
     Info << "ok" << endl;

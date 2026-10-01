@@ -42,8 +42,8 @@ Foam::incompressiblePhase::incompressiblePhase
 :
     fluidPhase(mesh,transportProperties,phaseName),
     phaseDict_(transportProperties.optionalSubDict("phase."+phaseName)),
-    mu_("mu",phaseDict_),
-    rho_("rho",phaseDict_)
+    mu_("mu",dimensionSet(1,-1,-1,0,0,0,0),phaseDict_),
+    rho_("rho",dimensionSet(1,-3,0,0,0,0,0),phaseDict_)
 {   
 }
 

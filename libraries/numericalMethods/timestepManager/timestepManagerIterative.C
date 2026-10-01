@@ -47,12 +47,12 @@ Foam::timestepManagerIterative::timestepManagerIterative(
     runTime_(runTime),
     iter_(0),
     iterIncrease_(-1),
-    maxIter_(solutionDict.subOrEmptyDict(algoName).getOrDefault<label>("maxIter",10)),
-    tolerance_(solutionDict.subOrEmptyDict(algoName).getOrDefault<scalar>("tolerance",1e+9)),
+    maxIter_(solutionDict.subOrEmptyDict(algoName).lookupOrDefault<label>("maxIter",10)),
+    tolerance_(solutionDict.subOrEmptyDict(algoName).lookupOrDefault<scalar>("tolerance",1e+9)),
     nIterIncreasePresent_(runTime_.controlDict().found(("nIter"+algoName))),
-    nIterIncrease_(runTime_.controlDict().getOrDefault<label>("nIter"+algoName, 0)),
-    dTFactDecrease_(runTime_.controlDict().getOrDefault<scalar>("dTFactDecrease", 0.8)),
-    dTFactIncrease_(runTime_.controlDict().getOrDefault<scalar>("dTFactIncrease", 1.25))
+    nIterIncrease_(runTime_.controlDict().lookupOrDefault<label>("nIter"+algoName, 0)),
+    dTFactDecrease_(runTime_.controlDict().lookupOrDefault<scalar>("dTFactDecrease", 0.8)),
+    dTFactIncrease_(runTime_.controlDict().lookupOrDefault<scalar>("dTFactIncrease", 1.25))
 {
     Info << nl << algoName << " loop control" << nl << "{"
     << nl << "    tolerance = " << tolerance_ << endl;

@@ -75,7 +75,7 @@ Foam::dualDynamicMesh::dualDynamicMesh
     );
 
     //- Protect patch dual-mesh cells from refinement
-    dynamicFvMesh& fineMesh = fineMeshPtr_.ref();
+    dynamicFvMesh& fineMesh = fineMeshPtr_();
     if (fineMesh.dynamic()) {
         if (isA<dynamicRefineFvMesh>(fineMesh)) {
             DynamicList<label> boundary_protected_cells(0);
@@ -85,7 +85,7 @@ Foam::dualDynamicMesh::dualDynamicMesh
                     boundary_protected_cells.append(fineMesh.boundary()[patchi].faceCells());
                 }
             }
-            refCast<dynamicRefineFvMesh>(fineMesh).protectedCell() = bitSet(boundary_protected_cells);
+            refCast<dynamicRefineFvMesh>(fineMesh).protectedCell() = PackedBoolList(boundary_protected_cells);
         }
     }
 }
@@ -98,7 +98,7 @@ void Foam::dualDynamicMesh::mapFieldCoarseToFine(
     Foam::GeometricField<Type, PatchField, Foam::volMesh>& field2
 )
 {
-    dynamicFvMesh& fineMesh = fineMeshPtr_.ref();
+    dynamicFvMesh& fineMesh = fineMeshPtr_();
     const refinementHistory& ref_hist = refCast<dynamicRefineFvMesh>(fineMesh).meshCutter().history();
     const labelIOList& cell_level =  refCast<dynamicRefineFvMesh>(fineMesh).meshCutter().cellLevel();
     label list_size = ref_hist.splitCells().size();
@@ -177,13 +177,12 @@ Foam::volScalarField& Foam::dualDynamicMesh::addField
             (
                 coarseField.name()+"_dual",
                 coarseField.time().timeName(),
-                fineMeshPtr_,
+                fineMeshPtr_(),
                 IOobject::READ_IF_PRESENT,
                 IOobject::AUTO_WRITE
             ),
-            fineMeshPtr_,
-            0,
-            coarseField.dimensions()
+            fineMeshPtr_(),
+            dimensioned<scalar>("zero", coarseField.dimensions(), 0)
         )
     );
     mapFieldCoarseToFine(coarseField, *scalarFields_.second()[current_id]);
@@ -205,13 +204,12 @@ Foam::volVectorField& Foam::dualDynamicMesh::addField
             (
                 coarseField.name()+"_dual",
                 coarseField.time().timeName(),
-                fineMeshPtr_,
+                fineMeshPtr_(),
                 IOobject::READ_IF_PRESENT,
                 IOobject::AUTO_WRITE
             ),
-            fineMeshPtr_,
-            Vector<scalar>(0,0,0),
-            coarseField.dimensions()
+            fineMeshPtr_(),
+            dimensioned<vector>("zero", coarseField.dimensions(), Vector<scalar>(0,0,0))
         )
     );
     mapFieldCoarseToFine(coarseField, *vectorFields_.second()[current_id]);
@@ -232,13 +230,12 @@ Foam::surfaceScalarField& Foam::dualDynamicMesh::addField
             (
                 coarsePhi.name()+"_dual",
                 coarsePhi.time().timeName(),
-                fineMeshPtr_,
+                fineMeshPtr_(),
                 IOobject::READ_IF_PRESENT,
                 IOobject::AUTO_WRITE
             ),
-        fineMeshPtr_,
-        0,
-        coarsePhi.dimensions(),
+        fineMeshPtr_(),
+        dimensioned<scalar>("zero", coarsePhi.dimensions(), 0),
         coarsePhi.boundaryField().types()
     );
     Info << "ok" << endl;

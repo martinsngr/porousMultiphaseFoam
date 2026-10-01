@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
     Info << "Create time\n" << Foam::endl;
     Time runTime(Time::controlDictName, args);
-    bool writeResiduals(runTime.controlDict().getOrDefault<bool>("writeResiduals", false));
+    bool writeResiduals(runTime.controlDict().lookupOrDefault<bool>("writeResiduals", false));
 
     #include "createMesh.H"
     Info << "Reading transportProperties" << endl;

@@ -38,7 +38,7 @@ Foam::autoPtr<Foam::multiMesh> Foam::multiMesh::New
     const dictionary& transportProperties
 )
 {
-    const word meshType(transportProperties.getOrDefault<word>("dualMesh", "simpleMesh"));
+    const word meshType(transportProperties.lookupOrDefault<word>("dualMesh", "simpleMesh"));
     Info << nl << "Dual mesh option => " << meshType << "\n" << endl;
 
     auto cstrIter = dictionaryConstructorTablePtr_->find(meshType);

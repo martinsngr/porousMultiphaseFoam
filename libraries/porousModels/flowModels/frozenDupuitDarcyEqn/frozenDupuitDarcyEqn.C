@@ -125,7 +125,7 @@ Foam::flowModels::frozenDupuitDarcyEqn::frozenDupuitDarcyEqn
     surfaceScalarField& phi = fluid.phi();
     if (!exists(phi.objectPath()))
     {
-        bool phiReconstruction = transportProperties.getOrDefault<bool>("phiReconstruction", true);
+        bool phiReconstruction = transportProperties.lookupOrDefault<bool>("phiReconstruction", true);
         Info << nl << "phi is not present: ";
         if (exists(mesh.time().timeName()/"potential") && exists(mesh.time().constant()/"K") &&
             transportProperties.found("rho") && transportProperties.found("mu") && phiReconstruction)
@@ -157,8 +157,8 @@ Foam::flowModels::frozenDupuitDarcyEqn::frozenDupuitDarcyEqn
             );
             surfaceScalarField Kf = fvc::interpolate(K);
             dimensionedScalar g("g",dimLength/(dimTime*dimTime),9.81);
-            const dimensionedScalar rho("rho",transportProperties);
-            const dimensionedScalar mu("mu",transportProperties);
+            const dimensionedScalar rho("rho",dimensionSet(1,-3,0,0,0,0,0),transportProperties);
+            const dimensionedScalar mu("mu",dimensionSet(1,-1,-1,0,0,0,0),transportProperties);
             phi = (-Kf*(g*rho/mu) * fvc::snGrad(potential)) * mesh.magSf();
             phi.write();
         }

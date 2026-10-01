@@ -99,6 +99,6 @@ if (isA<dynamicRefineFvMesh>(mesh)) {
             boundary_protected_cells.append(mesh.boundary()[patchi].faceCells());
         }
     }
-    refCast<dynamicRefineFvMesh>(mesh).protectedCell() = bitSet(boundary_protected_cells);
+    refCast<dynamicRefineFvMesh>(mesh).protectedCell() = PackedBoolList(boundary_protected_cells);
 }
 

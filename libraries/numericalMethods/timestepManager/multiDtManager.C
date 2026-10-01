@@ -180,7 +180,7 @@ void multiDtManager::adjustDeltaTUsingEvent()
     if ((nSteps < labelMax) && (nSteps != 0.0))
     {
         const auto nStepsToNextEvent = label(max(nSteps, 1) + 0.99);
-        runTime_.setDeltaT(timeToNextEvent/nStepsToNextEvent,false);
+        runTime_.setDeltaT(timeToNextEvent/nStepsToNextEvent);
     }
 
     //- To handle close event times (inferior to current timestep)
@@ -211,7 +211,7 @@ void multiDtManager::adjustDeltaTUsingEvent()
                 }
             }
         }
-        runTime_.setDeltaT(min(runTime_.deltaTValue(),timeToCloseEvent),false);
+        runTime_.setDeltaT(min(runTime_.deltaTValue(),timeToCloseEvent));
     }
 }
 

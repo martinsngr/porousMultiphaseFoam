@@ -105,7 +105,7 @@ public:
     ~dualStaticMesh() {}
 
     //- Return mesh
-    dynamicFvMesh& fineMesh() {return fineMeshPtr_.ref();}
+    dynamicFvMesh& fineMesh() {return fineMeshPtr_();}
 
     //- Increment list of dual-mesh fields
     volScalarField& addField(volScalarField&);

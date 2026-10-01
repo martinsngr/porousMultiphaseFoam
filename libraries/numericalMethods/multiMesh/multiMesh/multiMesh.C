@@ -57,7 +57,7 @@ Foam::multiMesh::multiMesh (Time& runTime, dynamicFvMesh& coarseMesh)
                     boundary_protected_cells.append(coarseMesh_.boundary()[patchi].faceCells());
                 }
             }
-            refCast<dynamicRefineFvMesh>(coarseMesh_).protectedCell() = bitSet(boundary_protected_cells);
+            refCast<dynamicRefineFvMesh>(coarseMesh_).protectedCell() = PackedBoolList(boundary_protected_cells);
         }
     }
 }

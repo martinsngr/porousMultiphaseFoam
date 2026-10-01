@@ -71,7 +71,7 @@ Foam::porousMediumTransportModels::dualPorosityTransport::dualPorosityTransport
             IOobject::NO_WRITE
         ),
         mesh,
-        transportProperties_.getOrDefault<dimensionedScalar>("epsMatrix", dimensionedScalar(dimless, 2))
+        transportProperties_.lookupOrDefault<dimensionedScalar>("epsMatrix", dimensionedScalar(dimless, 2))
     ),
     matrixComposition_(
         transportProperties_,
@@ -83,9 +83,9 @@ Foam::porousMediumTransportModels::dualPorosityTransport::dualPorosityTransport
         dimless,
         "Matrix"
     ),
-    a_(dualPorosityTransportCoeffs_.get<dimensionedScalar>("a")),
-    beta_(dualPorosityTransportCoeffs_.get<dimensionedScalar>("beta")),
-    gammaW_(dualPorosityTransportCoeffs_.get<dimensionedScalar>("gammaW")),
+    a_(dualPorosityTransportCoeffs_.lookup<dimensionedScalar>("a")),
+    beta_(dualPorosityTransportCoeffs_.lookup<dimensionedScalar>("beta")),
+    gammaW_(dualPorosityTransportCoeffs_.lookup<dimensionedScalar>("gammaW")),
     alphaS_(gammaW_*matrixComposition_.Dm(0)*beta_/(a_*a_)),
     exchangeTermFromFracture_
     (
@@ -136,7 +136,7 @@ void Foam::porousMediumTransportModels::dualPorosityTransport::solveTransport
     //- fracture part
     composition_.correct(U, theta);
 
-    dictionary solverDict = composition_.Y(0).mesh().solver("C");
+    dictionary solverDict = composition_.Y(0).mesh().solverDict("C");
     forAll(composition_.Y(), speciesi)
     {
         auto& C = composition_.Y(speciesi);
@@ -193,7 +193,7 @@ void Foam::porousMediumTransportModels::dualPorosityTransport::solveTransport
                 + alphaS_ * thetaMatrix_ * (Cfracture - C)
             );
 
-        CMatrixEqn.solve(C.mesh().solver("C"));
+        CMatrixEqn.solve(C.mesh().solverDict("C"));
 
         Info<< "Concentration: Min(" << speciesNames_[speciesi] << ") = " << gMin(C.internalField())
             << " Max(" << speciesNames_[speciesi] << ") = " << gMax(C.internalField())

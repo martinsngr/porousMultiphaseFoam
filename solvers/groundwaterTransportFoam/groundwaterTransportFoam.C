@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
     //- Create mesh (simple or dual)
     autoPtr<dynamicFvMesh> meshPtrFluid(dynamicFvMesh::New(args, runTime));
-    dynamicFvMesh& mesh = meshPtrFluid.ref();
+    dynamicFvMesh& mesh = meshPtrFluid();
 
     Info<< "Reading transportProperties" << endl;
     IOdictionary transportProperties
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     eventFlux::setEventFileRegistry(&patchEventList, "C");
 
     autoPtr<multiMesh> mMeshPtr(multiMesh::New(runTime, mesh, transportProperties));
-    dynamicFvMesh& meshT = mMeshPtr.ref().fineMesh();
+    dynamicFvMesh& meshT = mMeshPtr().fineMesh();
 
     //- fluid phase model
     autoPtr<incompressiblePhase> fluidPhase = incompressiblePhase::New(mesh, transportProperties, "theta");

@@ -226,7 +226,7 @@ bool Foam::XYfile::readMapping(Foam::IFstream& mappingFile)
     {
         mappingFile.getLine(line);
         DynamicList<string> split = splitLine(line, " ", 2, mappingFile.name());
-        if ((readInt(split[0]) != mesh_.C().size()) || (readInt(split[1]) != npoints_))
+        if ((std::stoi(split[0]) != mesh_.C().size()) || (std::stoi(split[1]) != npoints_))
         {
             return false;
         }
@@ -240,8 +240,8 @@ bool Foam::XYfile::readMapping(Foam::IFstream& mappingFile)
         DynamicList<string> split = splitLine(line, " ", ne, mappingFile.name());
         for(label pointi=0; pointi<npoints_; pointi++)
         {
-            mapping_[celli][pointi].first() = readInt(split[2*pointi]);
-            mapping_[celli][pointi].second() = readScalar(split[2*pointi+1]);
+            mapping_[celli][pointi].first() = std::stoi(split[2*pointi]);
+            mapping_[celli][pointi].second() = std::stod(split[2*pointi+1]);
         }
     }
     return true;

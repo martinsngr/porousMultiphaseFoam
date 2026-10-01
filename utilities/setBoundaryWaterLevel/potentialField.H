@@ -22,7 +22,7 @@
     {
         //- reading DEM informations
         DEMfile fixedPotentialDEM(args.opt("DEM"));
-	scalar offsetPotential = args.getOrDefault<scalar>("offset",0.);
+	scalar offsetPotential = args.optionLookupOrDefault<scalar>("offset",0.);
 	if (offsetPotential==0)
 	{
 	    Info << nl << "Potential fixed using DEM" << endl;
@@ -45,8 +45,8 @@
         word STLfile = args.opt("STL");
         triSurfaceMesh potentialSTL(IOobject(STLfile,mesh));
         pointField pPoints( potentialSTL.points() );
-	scalar thresholdPotential = args.getOrDefault<scalar>("threshold",0.);
-	scalar offsetPotential = args.getOrDefault<scalar>("offset",0.);
+	scalar thresholdPotential = args.optionLookupOrDefault<scalar>("threshold",0.);
+	scalar offsetPotential = args.optionLookupOrDefault<scalar>("offset",0.);
         Info << nl << "Potential fixed using points over " << thresholdPotential <<  " in STL = " << STLfile << " offseted by " << offsetPotential << endl;
         const vectorField faces = mesh.boundary()[patchID].patch().faceCentres();
 	
@@ -73,7 +73,7 @@
     else if (args.found("value"))
     {
         //- uniform potential
-        scalar uniformPotential = args.getOrDefault<scalar>("value",0.);
+        scalar uniformPotential = args.optionLookupOrDefault<scalar>("value",0.);
         Info << nl << "Uniform potential fixed = " << uniformPotential << " m " << endl;
         //- computing and writing local potential
         forAll(potentialPatch,facei)

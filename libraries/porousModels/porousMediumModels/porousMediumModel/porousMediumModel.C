@@ -101,7 +101,7 @@ Foam::porousMediumModel::porousMediumModel
         dimensionedScalar("",sourceDims,0)
     )
 {
-    auto Kfactor(transportProperties.getOrDefault<scalar>("Kfactor",1));
+    auto Kfactor(transportProperties.lookupOrDefault<scalar>("Kfactor",1));
     if (Kfactor != 1)
     {
         K_ *= Kfactor;

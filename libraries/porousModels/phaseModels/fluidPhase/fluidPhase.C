@@ -83,7 +83,7 @@ Foam::fluidPhase::fluidPhase
     }
     else
     {
-        phiPtr_.ref() = Foam::linearInterpolate(U_) & mesh.Sf();
+        phiPtr_() = Foam::linearInterpolate(U_) & mesh.Sf();
         Info<< nl << "Computing field phi" << phaseName << " from field U" << phaseName << endl;
     }
 }

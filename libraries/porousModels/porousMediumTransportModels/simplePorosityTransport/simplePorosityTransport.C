@@ -73,7 +73,7 @@ void Foam::porousMediumTransportModels::simplePorosityTransport::solveTransport
 {
     composition_.correct(U, theta);
 
-    dictionary solverDict = composition_.Y(0).mesh().solver("C");
+    dictionary solverDict = composition_.Y(0).mesh().solverDict("C");
     forAll(composition_.Y(), speciesi)
     {
         auto& C = composition_.Y(speciesi);
@@ -109,7 +109,7 @@ void Foam::porousMediumTransportModels::simplePorosityTransport::solveTransport
 {
     composition_.correct(U, eps);
 
-    dictionary solverDict = composition_.Y(0).mesh().solver("C");
+    dictionary solverDict = composition_.Y(0).mesh().solverDict("C");
     forAll(composition_.Y(), speciesi)
     {
         auto& C = composition_.Y(speciesi);

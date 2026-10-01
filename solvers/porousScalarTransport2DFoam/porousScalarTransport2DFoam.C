@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     //- Porous medium model
     porousMediumModel pmModel(mesh, transportProperties, dimLength/dimTime);
     //- Frozen flow-field (Dupuit-Darcy's equation)
-    flowModels::frozenDupuitDarcyEqn ddEqn(mesh, transportProperties, pmModel, fluidPhase.ref());
+    flowModels::frozenDupuitDarcyEqn ddEqn(mesh, transportProperties, pmModel, fluidPhase());
     //- Transport model
     Info << "Reading composition" << endl;
     autoPtr<porousMediumTransportModel> pmTransportModel =

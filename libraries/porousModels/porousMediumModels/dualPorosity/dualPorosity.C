@@ -129,9 +129,9 @@ Foam::porousMediumModels::dualPorosity::dualPorosity
         mesh,
         dualPorosityCoeffs_.lookupOrDefault("KExchange", dimensionedScalar(dimArea, 0))
     ),
-    a_(dualPorosityCoeffs_.get<dimensionedScalar>("a")),
-    beta_(dualPorosityCoeffs_.get<dimensionedScalar>("beta")),
-    gammaW_(dualPorosityCoeffs_.get<dimensionedScalar>("gammaW")),
+    a_(dualPorosityCoeffs_.lookup<dimensionedScalar>("a")),
+    beta_(dualPorosityCoeffs_.lookup<dimensionedScalar>("beta")),
+    gammaW_(dualPorosityCoeffs_.lookup<dimensionedScalar>("gammaW")),
     geomFactor_(beta_/(a_*a_)*gammaW_),
     UMatrix_
     (
@@ -168,7 +168,7 @@ Foam::porousMediumModels::dualPorosity::dualPorosity
     check_K(KMatrix_, dualPorosityCoeffs_);
     check_K(KExchange_, dualPorosityCoeffs_);
     Info << "} \n" << endl;
-    sourceTerm_.writeOpt(IOobject::AUTO_WRITE);
+    sourceTerm_.writeOpt() = IOobject::AUTO_WRITE;
     matrixPcModel_ = capillarityModel::New(mesh, transportProperties, Sname_, "Matrix");
     matrixKrModel_ = relativePermeabilityModel::New(mesh, transportProperties, Sname_, "Matrix");
     updateMatrixProperties();
