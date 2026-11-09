@@ -175,3 +175,9 @@ volScalarField sourceTerm
     mesh,
     dimensionedScalar("",dimless/dimTime,0)
 );
+
+// impesFoam's SEqn.H, shared through the SEqn.H symlink, carries the opt-in fixedSb clamp of 65ea0f9;
+// declared here and always inactive, so that anisoImpesFoam compiles and behaves as before (stock).
+const Switch fixedSbActive(false);
+const label fixedSbZoneID(-1);
+const scalar fixedSbValue(0);
